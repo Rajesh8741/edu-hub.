@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Money Hub - Home</title>
+        <link rel="stylesheet" href="style.css">
+        <script>
+        // Smooth scroll for nav links
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('nav a').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    const href = this.getAttribute('href');
+                    if(href.startsWith('#')) {
+                        e.preventDefault();
+                        document.querySelector(href).scrollIntoView({ behavior: 'smooth' });
+                    }
+                }); }); // Contact modal const contactBtn = document.getElementById('contactBtn'); const modal = document.getElementById('contactModal'); const closeModal = document.getElementById('closeModal'); if(contactBtn && modal && closeModal) { contactBtn.onclick = () => modal.style.display = 'block'; closeModal.onclick = () => modal.style.display = 'none'; window.onclick = (e) => { if(e.target == modal) modal.style.display = 'none'; }; } }); </script> </head> <body> <header class="navbar"> <div class="nav-container"> <div class="logo">MONEY HUB</div> <nav> <a href="#">Home</a> <a href="#nursing-subjects">Nursing</a> <a href="#team">Team</a> <a href="#services">Services</a> <a href="#contact" id="contactBtn">Contact</a>
+            </nav
+    </header>
+
+    <section class="hero">
+        <h1>Smart Finance Solutions</h1>
+        <p>Empowering your financial journey with expert advice and modern tools.</p>
+        <a class="cta" href="dashboard.html">Get Started</a>
+    </section>
+
+    <!-- Nursing Subjects Section -->
+    <section id="nursing-subjects" class="nursing-section">
+        <h2 class="nursing-title">Nursing Subjects</h2>
+        <div class="nursing-grid">
+            <div class="nursing-card">
+                <div class="nursing-icon">🩺</div>
+                <h3>Obstetrics & Gynecology</h3>
+                <p>MCQs and quizzes for OBG nursing.</p>
+                <a href="dashboard.html" class="nursing-btn">Start Quiz</a>
+            </div>
+            <div class="nursing-card">
+                <div class="nursing-icon">💉</div>
+                <h3>Medical Surgical Nursing</h3>
+                <p>Practice questions for Med-Surg topics.</p>
+                <a href="dashboard.html" class="nursing-btn">Start Quiz</a>
+            </div>
+            <div class="nursing-card">
+                <div class="nursing-icon">👶</div>
+                <h3>Pediatric Nursing</h3>
+                <p>Test your knowledge in child health nursing.</p>
+                <a href="dashboard.html" class="nursing-btn">Start Quiz</a>
+            </div>
+            <div class="nursing-card">
+                <div class="nursing-icon">🧠</div>
+                <h3>Psychiatric Nursing</h3>
+                <p>Quizzes for mental health and psychiatric nursing.</p>
+                <a href="dashboard.html" class="nursing-btn">Start Quiz</a>
+            </div>
+            <div class="nursing-card">
+                <div class="nursing-icon">🏥</div>
+                <h3>Community Health Nursing</h3>
+                <p>MCQs for community and public health topics.</p>
+                <a href="dashboard.html" class="nursing-btn">Start Quiz</a>
+                <a href="dashboard.html" class="nursing-btn">8741989196</a>
+            </div>
+        </div>
+    </section>
+
+    <section id="team" class="team-section">
+        <h2>Our Team</h2>
+        <div class="team-grid">
+            <div class="team-member">
+                <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Team Member">
+                <h3>Rahul Sharma</h3>
+                <p>CEO</p>
+            </div>
+            <div class="team-member">
+                <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Team Member">
+                <h3>Priya Singh</h3>
+                <p>Finance Expert</p>
+            </div>
+            <div class="team-member">
+                <img src="https://randomuser.me/api/portraits/men/54.jpg" alt="Team Member">
+                <h3>Amit Verma</h3>
+                <p>Advisor</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="services" class="cards-section">
+        <div class="card">
+            <h3>Expense Tracking</h3>
+            <p>Monitor your spending and stay on top of your finances with our easy-to-use tools.</p>
+        </div>
+        <div class="card">
+            <h3>Budget Planning</h3>
+            <p>Set budgets, track progress, and achieve your financial goals faster.</p>
+        </div>
+        <div class="card">
+            <h3>Expert Advice</h3>
+            <p>Get personalized tips and strategies from our finance professionals.</p>
+        </div>
+    </section>
+
+
+
+    <section class="logos-section">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg" alt="Microsoft" />
+        <img src="https://upload.wikimedia.org/wikipedia/commons/a/ab/Apple-logo.png" alt="Apple" />
+        <img src="https://upload.wikimedia.org/wikipedia/commons/5/51/IBM_logo.svg" alt="IBM" />
+        <img src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg" alt="Google" />
+    </section>
+
+        <div id="contactModal" class="modal">
+            <div class="modal-content">
+                <span id="closeModal" class="close">&times;</span>
+                <h2>Contact Us</h2>
+                <form>
+                    <input type="text" placeholder="Your Name" required><br>
+                    <input type="email" placeholder="Your Email" required><br>
+                    <textarea placeholder="Your Message" required></textarea><br>
+                    <button type="submit" class="cta">Send</button>
+                </form>
+            </div>
+        </div>
+        <footer class="footer">
+                &copy; 2025 Money Hub. All rights reserved.
+        </footer>
+        <script>
+        const uploadBtn = document.getElementById('uploadBtn');
+        const fileInput = document.getElementById('fileInput');
+        const statusDiv = document.getElementById('status');
+        let quizQuestions = [];
+        let quizReady = false;
+
+        uploadBtn.onclick = function() {
+          if(!fileInput.files.length) {
+            statusDiv.textContent = 'Please select a .docx file.';
+            statusDiv.style.color = 'red';
+            return;
+          }
+          const file = fileInput.files[0];
+          statusDiv.textContent = `Processing "${file.name}" ...`;
+          document.getElementById('loadingSpinner').style.display = '';
+          const formData = new FormData();
+          formData.append('file', file);
+          fetch('http://127.0.0.1:5000/upload-quiz', {
+            method: 'POST',
+            body: formData
+          })
+          .then(res => res.json())
+          .then(data => {
+            document.getElementById('loadingSpinner').style.display = 'none';
+            if(data.questions && data.questions.length) {
+              statusDiv.textContent = `Completed! Quiz ready. Total questions: ${data.questions.length}`;
+              statusDiv.style.color = 'green';
+              quizQuestions = data.questions;
+              quizReady = true;
+            } else {
+              statusDiv.textContent = 'No questions found in file.';
+              statusDiv.style.color = 'red';
+              quizQuestions = [];
+              quizReady = false;
+            }
+          })
+          .catch(err => {
+            document.getElementById('loadingSpinner').style.display = 'none';
+            statusDiv.textContent = 'Error: ' + err;
+            statusDiv.style.color = 'red';
+            quizQuestions = [];
+            quizReady = false;
+          }); }; const quiz = [ { question: "A patient is diagnosed with thrombocytopenia. Which nursing intervention is most important?",
+    options: {
+      a: "Encourage the patient to eat a diet high in iron to increase red blood cell production.",
+      b: "Assess the patient for signs and symptoms of bleeding, such as petechiae or ecchymosis.",
+      c: "Administer prophylactic antibiotics to prevent infection.",
+      d: "Monitor the patient's white blood cell count for signs of leukocytosis."
+    },
+    answer: "b",
+    solution: "Patients with thrombocytopenia have a low platelet count, increasing their risk of bleeding. Monitoring for signs of bleeding is crucial to prevent complications."
+  }
+];
+        </script>
+        <button id="uploadBtn">Upload Quiz Filecardiac Untitled</button>
+        
+</body>
+</html>

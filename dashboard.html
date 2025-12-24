@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <!-- Firebase App (core) SDK -->
+        <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+        <!-- Firebase Database SDK -->
+        <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+        <script>
+            // TODO: Replace below config with your Firebase project config
+            const firebaseConfig = {
+                apiKey: "YOUR_API_KEY",
+                authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+                databaseURL: "https://YOUR_PROJECT_ID.firebaseio.com",
+                projectId: "YOUR_PROJECT_ID",
+                storageBucket: "YOUR_PROJECT_ID.appspot.com",
+                messagingSenderId: "YOUR_SENDER_ID",
+                appId: "YOUR_APP_ID"
+            };
+            firebase.initializeApp(firebaseConfig);
+            const db = firebase.database();
+        </script>
+// Save quiz to Firebase
+function saveQuizToFirebase(section, title, questions, callback) {
+    db.ref('quizzes/' + section).set({
+        title: title,
+        questions: questions
+    }, function(error) {
+        if (error) {
+            if (callback) callback(false);
+        } else {
+            if (callback) callback(true);
+        }
+    });
+}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Money Hub - Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="navbar">
+        <div class="nav-container">
+            <div class="logo">MONEY HUB</div>
+            <nav>
+                <a href="index.html">Home</a>
+                <a href="#">Dashboard</a>
+            </nav>
+        </div>
+    </header>
+    <main>
+                <!-- Start Quiz Section -->
+                <section class="quiz-start-section">
+                    <h2>Available Quizzes</h2>
+                    <div id="quizListContainer" style="display:flex;flex-wrap:wrap;gap:16px;margin-top:18px;"></div>
+                    <div id="quizStartStatus" style="margin-top:10px;"></div>
+                </section>
+
+                <!-- Create Quiz Section (hidden by default) -->
+                <section class="quiz-create-section" id="quizCreateSection" style="display:block;">
+                    <div id="quizCreateStatus" class="quiz-create-status"></div>
+                    <h2>Create Quiz</h2>
+                    <div class="quiz-meta-form">
+                                                <input id="quizNameInputMain" type="text" placeholder="Quiz Name">
+                                                <select id="quizSectionSelectMain">
+                                                    <option value="Obstetrics & Gynecology">Obstetrics & Gynecology</option>
+                                                    <option value="Medical Surgical Nursing">Medical Surgical Nursing</option>
+                                                    <option value="Pediatric Nursing">Pediatric Nursing</option>
+                                                    <option value="Psychiatric Nursing">Psychiatric Nursing</option>
+                                                    <option value="Community Health Nursing">Community Health Nursing</option>
+                                                    <option value="Nursing">Nursing</option>
+                                                    <option value="Pharmacy">Pharmacy</option>
+                                                    <option value="Lab">Lab</option>
+                                                </select>
+                    </div>
+                    <div class="upload-section">
+                        <h3>Paste Questions</h3>
+                        <label for="pasteQuestionsInput">Paste Questions:</label>
+                        <textarea id="pasteQuestionsInput" rows="10" class="quiz-textarea" placeholder="Paste your questions here..."></textarea>
+                        <button class="cta" id="generateQuizBtn">Generate Quiz</button>
+                        <div id="pasteStatus"></div>
+                        <div id="quizCreateStatus" style="margin-top:10px;"></div>
+                    </div>
+                </section>
+                <div style="text-align:center;margin:24px 0;">
+                    <button class="cta" id="showCreateQuizBtn">Create Quiz</button>
+                </div>
+        <!-- WHAT WE DO SECTION -->
+        <section class="what-we-do-section">
+            <div class="section-title">
+                <span>Our Expertise</span>
+                <h2>WHAT WE DO</h2>
+            </div>
+            <div class="what-we-do-grid">
+                <div class="what-card" id="entityFormationBtn">Entity Formation</div>
+        <!-- Entity Formation Quiz Modal -->
+        <div id="quizModal" class="modal">
+            <div class="modal-content">
+                <span id="closeQuizModal" class="close">&times;</span>
+                <h2>Nursing Quiz</h2>
+                <div class="quiz-btns">
+                    <button class="quiz-btn">Quiz 1</button>
+                    <button class="quiz-btn">Quiz 2</button>
+                    <button class="quiz-btn">Quiz 3</button>
+                </div>
+            </div>
+        </div>
+                <div class="what-card">Entity Management</div>
+                <div class="what-card">Wills & Trusts</div>
+                <div class="what-card">Tax & Accounting</div>
+                <div class="what-card">Wealth Management</div>
+            </div>
+        </section>
+
+        <!-- WHO WE SERVE SECTION -->
+        <section class="who-we-serve-section">
+            <div class="section-title">
+                    <script>
+                    // Show/Hide Create Quiz Section
+                    const showCreateQuizBtn = document.getElementById('showCreateQuizBtn');
+                    const quizCreateSection = document.getElementById('quizCreateSection');
+                    if(showCreateQuizBtn && quizCreateSection) {
+                        showCreateQuizBtn.onclick = function() {
+                            quizCreateSection.style.display = quizCreateSection.style.display === 'none' ? 'block' : 'none';
+                        };
+                    }
+
+                    // Dynamic Quiz List for Starting Quizzes
+                    const quizListContainer = document.getElementById('quizListContainer');
+                    const quizStartStatus = document.getElementById('quizStartStatus');
+                    function renderQuizList() {
+                        if (!quizListContainer) return;
+                        quizListContainer.innerHTML = '';
+                        let found = false;
+                        for (let i = 0; i < localStorage.length; i++) {
+                            const key = localStorage.key(i);
+                            if (key.startsWith('quiz_') && !key.endsWith('_title')) {
+                                const section = key.replace('quiz_', '');
+                                const title = localStorage.getItem('quiz_' + section + '_title') || (section + ' Quiz');
+                                // Create button for each quiz
+                                const btn = document.createElement('button');
+                                btn.className = 'cta';
+                                btn.style.marginBottom = '8px';
+                                btn.textContent = title + ' (' + section + ')';
+                                btn.onclick = function() {
+                                    const savedQuiz = localStorage.getItem('quiz_' + section);
+                                    const savedTitle = localStorage.getItem('quiz_' + section + '_title');
+                                    console.log('DEBUG: Button clicked for section:', section);
+                                    console.log('DEBUG: Loaded quiz title:', savedTitle);
+                                    console.log('DEBUG: Raw savedQuiz:', savedQuiz);
+                                    if (savedQuiz) {
+                                        try {
+                                            const questions = JSON.parse(savedQuiz);
+                                            console.log('DEBUG: Parsed questions:', questions);
+                                            if (Array.isArray(questions) && questions.length) {
+                                                if (window.showQuiz) {
+                                                    window.showQuiz(questions, title, section);
+                                                } else {
+                                                    alert('Quiz function not loaded!');
+                                                }
+                                                return;
+                                            } else {
+                                                console.warn('DEBUG: Questions array is empty or invalid:', questions);
+                                            }
+                                        } catch (e) {
+                                            console.error('DEBUG: Error parsing questions:', e);
+                                        }
+                                    } else {
+                                        console.warn('DEBUG: No savedQuiz found for section:', section);
+                                    }
+                                    quizStartStatus.textContent = 'No quiz found for this quiz.';
+                                    quizStartStatus.style.color = 'red';
+                                };
+                                quizListContainer.appendChild(btn);
+                                found = true;
+                            }
+                        }
+                        if (!found) {
+                            quizListContainer.innerHTML = '<div style="color:#ff6f61;font-weight:600;">No quizzes available. Please create a quiz first!</div>';
+                        }
+                    }
+                    document.addEventListener('DOMContentLoaded', function() {
+                        renderQuizList();
+                        window.renderQuizList = renderQuizList;
+
+                        // Paste Questions Feature (robust)
+                        const pasteInput = document.getElementById('pasteQuestionsInput');
+                        const generateBtn = document.getElementById('generateQuizBtn');
+                        const pasteStatus = document.getElementById('pasteStatus');
+                        if (pasteInput && generateBtn && pasteStatus) {
+                                                        generateBtn.onclick = function() {
+                                                                const text = pasteInput.value.trim();
+                                                                if (!text) {
+                                                                        pasteStatus.textContent = 'Please paste your questions.';
+                                                                        pasteStatus.style.color = 'red';
+                                                                        return;
+                                                                }
+                                                                // Parse pasted text
+                                                                const blocks = text.split(/\[Q\]/).map(b => b.trim()).filter(b => b);
+                                                                const questions = blocks.map(block => {
+                                                                        // Extract question
+                                                                        const qMatch = block.match(/(.+?)\n\(a\)/s);
+                                                                        const question = qMatch ? qMatch[1].trim() : '';
+                                                                        // Extract options
+                                                                        const optMatches = Array.from(block.matchAll(/\(([a-d])\)\s*([^\n]+)/g));
+                                                                        const options = {};
+                                                                        optMatches.forEach(m => { options[m[1]] = m[2].trim(); });
+                                                                        // Extract answer
+                                                                        const ansMatch = block.match(/\[ANS\]\s*([a-d])/);
+                                                                        const answer = ansMatch ? ansMatch[1] : '';
+                                                                        // Extract solution
+                                                                        const solMatch = block.match(/\[SOL\](.+)/s);
+                                                                        const solution = solMatch ? solMatch[1].trim() : '';
+                                                                        if (question && Object.keys(options).length && answer) {
+                                                                                return { question, options, answer, solution };
+                                                                        }
+                                                                        return null;
+                                                                }).filter(q => q);
+                                                                if (questions.length) {
+                                                                        pasteStatus.textContent = `Quiz ready! Total questions: ${questions.length}`;
+                                                                        pasteStatus.style.color = 'green';
+                                                                        // Get quiz name and section from form
+                                                                        const quizNameInput = document.getElementById('quizNameInputMain');
+                                                                        const quizSectionSelect = document.getElementById('quizSectionSelectMain');
+                                                                        let quizTitle = quizNameInput && quizNameInput.value.trim() ? quizNameInput.value.trim() : 'Nursing Quiz';
+                                                                        let quizSection = quizSectionSelect ? quizSectionSelect.value : 'Nursing';
+                                                                        // Save quiz to Firebase
+                                                                        saveQuizToFirebase(quizSection, quizTitle, questions, function(success) {
+                                                                            const quizCreateStatus = document.getElementById('quizCreateStatus');
+                                                                            if (success) {
+                                                                                if (quizCreateStatus) {
+                                                                                    quizCreateStatus.textContent = `Quiz "${quizTitle}" created for section "${quizSection}" (Firebase)!`;
+                                                                                    quizCreateStatus.style.color = 'green';
+                                                                                }
+                                                                                if (window.renderQuizList) window.renderQuizList();
+                                                                            } else {
+                                                                                if (quizCreateStatus) {
+                                                                                    quizCreateStatus.textContent = '❌ Quiz save failed!';
+                                                                                    quizCreateStatus.style.color = 'red';
+                                                                                }
+                                                                            }
+                                                                        });
+                                                                } else {
+                                                                        pasteStatus.textContent = 'No valid questions found.';
+                                                                        pasteStatus.style.color = 'red';
+                                                                }
+                                                        };
+                        }
+
+                        // ...existing code...
+
+                        // Show/Hide Create Quiz Section
+                        const showCreateQuizBtn = document.getElementById('showCreateQuizBtn');
+                        const quizCreateSection = document.getElementById('quizCreateSection');
+                        if(showCreateQuizBtn && quizCreateSection) {
+                            showCreateQuizBtn.onclick = function() {
+                                quizCreateSection.style.display = quizCreateSection.style.display === 'none' ? 'block' : 'none';
+                            };
+                        }
+                    });
+                            // Create full-screen overlay/modal for quiz
+                            let quizOverlay = document.getElementById('quizOverlay');
+                            if (!quizOverlay) {
+                                quizOverlay = document.createElement('div');
+                                quizOverlay.id = 'quizOverlay';
+                                quizOverlay.style.position = 'fixed';
+                                quizOverlay.style.top = '0';
+                                quizOverlay.style.left = '0';
+                                quizOverlay.style.width = '100vw';
+                                quizOverlay.style.height = '100vh';
+                                quizOverlay.style.background = 'linear-gradient(-45deg, #6a11cb, #2575fc, #ffb347, #6ee7b7, #ff6f61, #60a5fa)';
+                                quizOverlay.style.backgroundSize = '400% 400%';
+                                quizOverlay.style.animation = 'quizGradientMove 12s ease infinite';
+                                quizOverlay.style.zIndex = '9999';
+                                quizOverlay.style.display = 'flex';
+                                quizOverlay.style.justifyContent = 'center';
+                                quizOverlay.style.alignItems = 'center';
+                                quizOverlay.style.overflow = 'hidden';
+                                document.body.appendChild(quizOverlay);
+                                document.body.style.overflow = 'hidden';
+                                // Add keyframes for animated gradient
+                                if(!document.getElementById('quizGradientStyle')) {
+                                    const style = document.createElement('style');
+                                    style.id = 'quizGradientStyle';
+                                    style.innerHTML = `@keyframes quizGradientMove {
+                                        0% {background-position:0% 50%;}
+                                        50% {background-position:100% 50%;}
+                                        100% {background-position:0% 50%;}
+                                    }`;
+                                    document.head.appendChild(style);
+                                }
+                            }
+                            function closeQuizOverlay() {
+                                quizOverlay.remove();
+                                document.body.style.overflow = '';
+                            }
+                            if(!questions.length) {
+                                quizOverlay.innerHTML = '<div style="color:red;background:#fff;padding:32px;border-radius:8px;">No questions found in file.<br><button onclick="document.getElementById(\'quizOverlay\').remove()" class="cta">Close</button></div>';
+                                return;
+                            }
+                            let userAnswers = Array(questions.length).fill(null);
+                            // Quiz title and section display
+                            let quizHeader = `<div style="text-align:center;margin-bottom:16px;">
+                                <h2 style="margin:0;font-family:'Poppins',sans-serif;font-size:2.2em;letter-spacing:1px;">${title ? title : 'Quiz'}</h2>
+                                ${section ? `<div style='font-size:1.1em;color:#2575fc;font-weight:600;margin-top:2px;'>${section}</div>` : ''}
+                            </div>`;
+                            // ...existing code for renderQ and rest of quiz UI...
+                                quizOverlay.style.background = `linear-gradient(120deg,rgba(255,255,255,0.45),rgba(0,198,251,0.45)), url('10-quiz-template-collage.webp') center/cover no-repeat`;
+                                quizOverlay.style.backgroundRepeat = 'no-repeat';
+                                quizOverlay.style.backgroundSize = 'cover';
+                                quizOverlay.style.fontFamily = "'Poppins', 'Nunito', Arial, sans-serif";
+                                // Progress bar
+                                const progress = `<div style='width:100%;margin-bottom:18px;'><div style='font-size:1.1em;color:#1e90ff;font-weight:600;letter-spacing:0.5px;margin-bottom:4px;'>Question ${idx+1} of ${questions.length}</div><div style='width:100%;height:8px;background:#e0e7ef;border-radius:6px;overflow:hidden;'><div style='height:100%;width:${((idx+1)/questions.length)*100}%;background:linear-gradient(90deg,#1e90ff,#00c6fb);border-radius:6px;transition:width 0.4s;'></div></div></div>`;
+                                // Circular question numbers (A, B, C...)
+                                const alpha = i => String.fromCharCode(65 + i);
+                                quizOverlay.innerHTML = `<div class='quiz-card' style='max-width:600px;width:100%;background:rgba(255,255,255,0.82);backdrop-filter:blur(12px);padding:38px 28px 28px 28px;border-radius:28px;box-shadow:0 8px 32px #0002,0 2px 24px #00c6fb22;position:relative; border: 2.5px solid #e0e7ef;transition:box-shadow 0.3s;'>
+                                    <button style='position:absolute;top:18px;right:18px;font-size:1.7em;background:none;border:none;cursor:pointer;color:#1e90ff;' id='closeQuizOverlayBtn' title='Close'>&times;</button>
+                                    <div id='quizNavBar' style='width:100%;overflow-x:auto;display:flex;gap:14px;padding:8px 0 18px 0;scrollbar-width:thin;scrollbar-color:#1e90ff #e0e7ef;'>
+                                        ${questions.map((_,i)=>`
+                                            <span class='quiz-nav-icon' data-idx='${i}' style='
+                                                min-width:40px;height:40px;display:flex;align-items:center;justify-content:center;
+                                                border-radius:12px;
+                                                background:${i===idx?'#00c6fb':'#fff'};
+                                                color:${i===idx?'#fff':'#1e90ff'};
+                                                font-weight:700;font-size:1.15em;font-family:Poppins,sans-serif;
+                                                box-shadow:0 2px 8px #00c6fb22;
+                                                cursor:pointer;
+                                                border:2.5px solid ${i===idx?'#ffb347':'#e0e7ef'};
+                                                transition:background 0.2s, border 0.2s, color 0.2s;
+                                                margin-bottom:2px;
+                                            ' onmouseover="this.style.background='#e0e7ef'" onmouseout="this.style.background='${i===idx?'#00c6fb':'#fff'}'">
+                                                ${alpha(i)}
+                                            </span>
+                                        `).join('')}
+                                    </div>
+                                    ${progress}
+                                    <div class='quiz-q' style='font-size:1.6em;font-weight:700;margin-bottom:28px;color:#1e90ff;text-shadow:0 2px 8px #00c6fb22;line-height:1.3;'>${q.question}</div>
+                                    <div class='quiz-options' style='margin-bottom:22px;'>
+                                        ${opts.map((opt,i)=>`<button class='quiz-opt' data-key='${opt.key}' ${userAnswers[idx]!==null?'disabled':''} style='margin-bottom:18px;width:100%;text-align:left;padding:18px 24px;border-radius:16px;border:none;background:${userAnswers[idx]===opt.key?(opt.key===q.answer||opt.key===q.ans?'#22c55e':'#ef4444'):'#fff'};color:${userAnswers[idx]===opt.key?'#fff':'#1e90ff'};font-size:1.18em;box-shadow:0 2px 16px #00c6fb22;cursor:pointer;transition:all 0.2s;font-weight:600;letter-spacing:0.5px;display:flex;align-items:center;gap:16px;position:relative;overflow:hidden;' onmouseover="this.style.transform='scale(1.03)';this.style.boxShadow='0 4px 24px #00c6fb33'" onmouseout="this.style.transform='';this.style.boxShadow='0 2px 16px #00c6fb22'">
+                                            <span style='display:inline-block;width:36px;height:36px;border-radius:50%;background:${['#1e90ff','#00c6fb','#ffb347','#ff6f61'][i%4]};color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.08em;font-weight:700;'>${alpha(i)}</span>
+                                            <span>${opt.text}</span>
+                                        </button>`).join('')}
+                                    </div>
+                                    <div class='quiz-feedback' style='margin-bottom:22px;font-size:1.13em;min-height:32px;'>${userAnswers[idx]!==null ? (userAnswers[idx] === (q.answer||q.ans) ? `<span style='color:#22c55e;font-weight:700;'>✔ Correct!</span><br><b style='color:#1e90ff;'>Solution:</b> ${(q.solution||q.sol)}` : `<span style='color:#ef4444;font-weight:700;'>✖ Wrong!</span> <span style='color:#1e90ff;'>Correct: (${q.answer||q.ans})</span><br><b style='color:#1e90ff;'>Solution:</b> ${(q.solution||q.sol)}`) : ''}</div>
+                                    <div class='quiz-nav' style='margin-top:18px;display:flex;gap:16px;justify-content:center;'>
+                                        <button class="quiz-prev" ${idx===0?'disabled':''} style='background:#fff;color:#1e90ff;padding:12px 22px;border-radius:12px;border:2px solid #1e90ff;font-size:1.13em;cursor:pointer;display:flex;align-items:center;gap:8px;font-weight:700;box-shadow:0 2px 8px #00c6fb22;transition:all 0.2s;'>⬅ Previous</button>
+                                        <button class="quiz-next" ${idx===questions.length-1?'disabled':''} style='background:#1e90ff;color:#fff;padding:12px 22px;border-radius:12px;border:none;font-size:1.13em;cursor:pointer;display:flex;align-items:center;gap:8px;font-weight:700;box-shadow:0 2px 8px #00c6fb22;transition:all 0.2s;'>Next ➡</button>
+                                        ${idx===questions.length-1?'<button class="quiz-submit" style="background:#ffb347;color:#fff;padding:12px 22px;border-radius:12px;border:none;font-size:1.13em;cursor:pointer;font-weight:700;box-shadow:0 2px 8px #ffb34733;transition:all 0.2s;">Submit</button>':''}
+                                        <button class="quiz-restart" style='background:#fff;color:#ff6f61;padding:12px 22px;border-radius:12px;border:2px solid #ff6f61;font-size:1.13em;cursor:pointer;display:flex;align-items:center;gap:8px;font-weight:700;box-shadow:0 2px 8px #ff6f6133;transition:all 0.2s;'>🔄 Restart</button>
+                                        <button class="quiz-exit" style='background:#fff;color:#333;padding:12px 22px;border-radius:12px;border:2px solid #e0e7ef;font-size:1.13em;cursor:pointer;display:flex;align-items:center;gap:8px;font-weight:700;box-shadow:0 2px 8px #0001;transition:all 0.2s;'>Go to Dashboard</button>
+                                    </div>
+                                </div>`;
+                                // Animate question transitions
+                                const quizCard = quizOverlay.querySelector('.quiz-card');
+                                quizCard.style.opacity = 0;
+                                quizCard.style.transform = 'translateY(30px) scale(0.98)';
+                                setTimeout(()=>{
+                                    quizCard.style.transition = 'all 0.45s cubic-bezier(.4,2,.3,1)';
+                                    quizCard.style.opacity = 1;
+                                    quizCard.style.transform = 'translateY(0) scale(1)';
+                                }, 30);
+                                // Navigator bar click actions
+                                quizOverlay.querySelectorAll('.quiz-nav-icon').forEach(icon => {
+                                    icon.onclick = function(e) {
+                                        e.stopPropagation();
+                                        const goIdx = parseInt(this.getAttribute('data-idx'));
+                                        renderQ(goIdx);
+                                    };
+                                });
+                                document.getElementById('closeQuizOverlayBtn').onclick = closeQuizOverlay;
+                                quizOverlay.querySelectorAll('.quiz-opt').forEach(btn => {
+                                    btn.onclick = function() {
+                                        if(userAnswers[idx]!==null) return;
+                                        const key = this.getAttribute('data-key');
+                                        userAnswers[idx] = key;
+                                        if(key === (q.answer||q.ans)) quizScore++;
+                                        renderQ(idx);
+                                    };
+                                });
+                                quizOverlay.querySelector('.quiz-prev').onclick = function() {
+                                    if(idx>0) renderQ(idx-1);
+                                };
+                                quizOverlay.querySelector('.quiz-next').onclick = function() {
+                                    if(idx<questions.length-1) renderQ(idx+1);
+                                };
+                                const submit = quizOverlay.querySelector('.quiz-submit');
+                                if(submit) submit.onclick = function() {
+                                    let score = userAnswers.filter((ans,i)=>ans===((questions[i].answer)||(questions[i].ans))).length;
+                                    quizOverlay.innerHTML = `<div class='quiz-card' style='text-align:center;max-width:600px;width:100%;background:#fff;padding:40px 32px;border-radius:18px;box-shadow:0 8px 32px #0003;position:relative; border: 3px solid #2575fc;'>
+                                        <button style='position:absolute;top:16px;right:16px;font-size:1.5em;background:none;border:none;cursor:pointer;color:#2575fc;' id='closeQuizOverlayBtn' title='Close'>&times;</button>
+                                        <h2 style='color:#2575fc;'>Quiz Complete!</h2>
+                                        <div style='font-size:1.3em;margin:22px 0;color:#22c55e;'>Your Score: <b>${score} / ${questions.length}</b></div>
+                                        <button class='cta quiz-restart' style='background:#ff6f61;color:#fff;padding:12px 24px;border-radius:8px;border:none;font-size:1.1em;cursor:pointer;margin:0 8px;'>Restart Quiz</button>
+                                        <button class='cta quiz-exit' style='background:#333;color:#fff;padding:12px 24px;border-radius:8px;border:none;font-size:1.1em;cursor:pointer;margin:0 8px;'>Go to Dashboard</button>
+                                    </div>`;
+                                    document.getElementById('closeQuizOverlayBtn').onclick = closeQuizOverlay;
+                                    quizOverlay.querySelector('.quiz-restart').onclick = function() {
+                                        userAnswers = Array(questions.length).fill(null);
+                                        quizScore = 0;
+                                        renderQ(0);
+                                    };
+                                    quizOverlay.querySelector('.quiz-exit').onclick = closeQuizOverlay;
+                                };
+                                quizOverlay.querySelector('.quiz-restart').onclick = function() {
+                                    userAnswers = Array(questions.length).fill(null);
+                                    quizScore = 0;
+                                    renderQ(0);
+                                };
+                                quizOverlay.querySelector('.quiz-exit').onclick = closeQuizOverlay;
+                            }
+                            renderQ(current);
+                        }
+
+                        // Entity Formation Quiz Modal Logic + Quiz 1 Action
+                        const entityBtn = document.getElementById('entityFormationBtn');
+                        const quizModal = document.getElementById('quizModal');
+                        const closeQuiz = document.getElementById('closeQuizModal');
+                        if(entityBtn && quizModal && closeQuiz) {
+                            entityBtn.onclick = () => quizModal.style.display = 'block';
+                            closeQuiz.onclick = () => quizModal.style.display = 'none';
+                            window.onclick = (e) => { if(e.target == quizModal) quizModal.style.display = 'none'; };
+                            // Quiz 1 button action
+                            const quiz1Btn = quizModal.querySelector('.quiz-btn');
+                            if(quiz1Btn) {
+                                quiz1Btn.onclick = function() {
+                                    quizModal.style.display = 'none';
+                                    // Try to load quiz from localStorage
+                                    let savedQuiz = localStorage.getItem('quiz1');
+                                    let savedTitle = localStorage.getItem('quiz1_title') || '';
+                                    let savedSection = localStorage.getItem('quiz1_section') || '';
+                                    if(savedQuiz) {
+                                        try {
+                                            let questions = JSON.parse(savedQuiz);
+                                            if(Array.isArray(questions) && questions.length) {
+                                                showQuiz(questions, savedTitle, savedSection);
+                                                return;
+                                            }
+                                        } catch(e) {}
+                                    }
+                                    alert('Please paste questions or upload a quiz file first!');
+                                };
+                            }
+                        }
+                    // Show Quiz Info Modal
+                    function showQuizInfoModal() {
+                        const modal = document.getElementById('quizInfoModal');
+                        const titleInput = document.getElementById('quizTitleInput');
+                        const sectionInput = document.getElementById('quizSectionInput');
+                        const submitBtn = document.getElementById('quizInfoSubmitBtn');
+
+                    }
+                    // ...existing code...
+</script>
+</html>
